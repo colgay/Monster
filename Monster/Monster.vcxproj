@@ -90,9 +90,10 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;HAVE_STDINT_H;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;HAVE_STDINT_H;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)sdk;$(AMXX)\public;$(AMXX)\public\amtl;$(AMXX)\third_party;$(AMXX)\third_party\hashing;$(METAMOD)\metamod;$(HLSDK)\common;$(HLSDK)\engine;$(HLSDK)\dlls;$(HLSDK)\pm_shared;$(HLSDK)\public;..\..\Waypoint\Waypoint\waypoint_api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)sdk;..\..\SDK\amxmodx\public;..\..\SDK\amxmodx\public\amtl;..\..\SDK\amxmodx\third_party;..\..\SDK\amxmodx\third_party\hashing;..\..\SDK\metamod;..\..\SDK\hlsdk\common;..\..\SDK\hlsdk\engine;..\..\SDK\hlsdk\dlls;..\..\SDK\hlsdk\pm_shared;..\..\SDK\hlsdk\public;..\..\Waypoint;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -102,8 +103,7 @@
       <AdditionalDependencies>Waypoint_amxx.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(TargetDir)$(TargetName).dll" "C:\cs_server\cstrike\addons\amxmodx\modules\$(TargetName).dll"
-copy /Y "..\..\Waypoint\$(IntDir)Waypoint_amxx.dll" "$(OutDir)"</Command>
+      <Command>copy /Y "$(TargetDir)$(TargetName).dll" "F:\servers\CS\cstrike\addons\amxmodx\modules\$(TargetName).dll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -112,9 +112,10 @@ copy /Y "..\..\Waypoint\$(IntDir)Waypoint_amxx.dll" "$(OutDir)"</Command>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;HAVE_STDINT_H;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;HAVE_STDINT_H;_CRT_SECURE_NO_WARNINGS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)sdk;$(AMXX)\public;$(AMXX)\public\amtl;$(AMXX)\third_party;$(AMXX)\third_party\hashing;$(METAMOD)\metamod;$(HLSDK)\common;$(HLSDK)\engine;$(HLSDK)\dlls;$(HLSDK)\pm_shared;$(HLSDK)\public;..\..\Waypoint\Waypoint\waypoint_api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)sdk;..\..\SDK\amxmodx\public;..\..\SDK\amxmodx\public\amtl;..\..\SDK\amxmodx\third_party;..\..\SDK\amxmodx\third_party\hashing;..\..\SDK\metamod;..\..\SDK\hlsdk\common;..\..\SDK\hlsdk\engine;..\..\SDK\hlsdk\dlls;..\..\SDK\hlsdk\pm_shared;..\..\SDK\hlsdk\public;..\..\Waypoint;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -126,8 +127,7 @@ copy /Y "..\..\Waypoint\$(IntDir)Waypoint_amxx.dll" "$(OutDir)"</Command>
       <AdditionalDependencies>Waypoint_amxx.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(TargetDir)$(TargetName).dll" "C:\cs_server\cstrike\addons\amxmodx\modules\$(TargetName).dll"
-copy /Y "..\..\Waypoint\$(IntDir)Waypoint_amxx.dll" "$(OutDir)"</Command>
+      <Command>copy /Y "$(TargetDir)$(TargetName).dll" "F:\servers\CS\cstrike\addons\amxmodx\modules\$(TargetName).dll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -159,20 +159,48 @@ copy /Y "..\..\Waypoint\$(IntDir)Waypoint_amxx.dll" "$(OutDir)"</Command>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Monster.h" />
-    <ClInclude Include="MonsterBase.h" />
-    <ClInclude Include="MonsterManager.h" />
+    <ClInclude Include="Base.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="BaseMonster.h" />
+    <ClInclude Include="config_parser.h" />
+    <ClInclude Include="EntityWrapper.h" />
+    <ClInclude Include="ham\hamsandwich.h" />
+    <ClInclude Include="ham\ham_const.h" />
+    <ClInclude Include="ham\ham_hook.h" />
+    <ClInclude Include="ham\ham_hooklist.h" />
+    <ClInclude Include="ham\ham_hook_callbacks.h" />
+    <ClInclude Include="ham\offsets.h" />
+    <ClInclude Include="ham\Trampolines.h" />
+    <ClInclude Include="MonsterManager.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="sdk\amxxmodule.h" />
     <ClInclude Include="sdk\moduleconfig.h" />
     <ClInclude Include="Utils.h" />
+    <ClInclude Include="Zombie.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Waypoint\Waypoint\waypoint_api\WaypointApi.cpp" />
+    <ClCompile Include="Base.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="BaseMonster.cpp" />
+    <ClCompile Include="config_parser.cpp" />
+    <ClCompile Include="ham\hamsandwich.cpp" />
     <ClCompile Include="Module.cpp" />
-    <ClCompile Include="Monster.cpp" />
-    <ClCompile Include="MonsterManager.cpp" />
+    <ClCompile Include="MonsterManager.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="sdk\amxxmodule.cpp" />
     <ClCompile Include="Utils.cpp" />
+    <ClCompile Include="Zombie.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

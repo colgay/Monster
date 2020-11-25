@@ -11,7 +11,13 @@
     </Filter>
     <Filter Include="SDK">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+      <Extensions>
+      </Extensions>
+    </Filter>
+    <Filter Include="hamsandwich">
+      <UniqueIdentifier>{0429e63f-2fea-43cc-ae6c-c47b544ed2ab}</UniqueIdentifier>
+      <Extensions>
+      </Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -21,16 +27,46 @@
     <ClInclude Include="sdk\amxxmodule.h">
       <Filter>SDK</Filter>
     </ClInclude>
-    <ClInclude Include="Monster.h">
+    <ClInclude Include="Utils.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="MonsterBase.h">
+    <ClInclude Include="config_parser.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="ham\hamsandwich.h">
+      <Filter>hamsandwich</Filter>
+    </ClInclude>
+    <ClInclude Include="ham\ham_const.h">
+      <Filter>hamsandwich</Filter>
+    </ClInclude>
+    <ClInclude Include="ham\ham_hook.h">
+      <Filter>hamsandwich</Filter>
+    </ClInclude>
+    <ClInclude Include="ham\ham_hooklist.h">
+      <Filter>hamsandwich</Filter>
+    </ClInclude>
+    <ClInclude Include="ham\ham_hook_callbacks.h">
+      <Filter>hamsandwich</Filter>
+    </ClInclude>
+    <ClInclude Include="ham\Trampolines.h">
+      <Filter>hamsandwich</Filter>
+    </ClInclude>
+    <ClInclude Include="ham\offsets.h">
+      <Filter>hamsandwich</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseMonster.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="MonsterManager.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Utils.h">
+    <ClInclude Include="Base.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Zombie.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityWrapper.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
@@ -41,17 +77,29 @@
     <ClCompile Include="Module.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Waypoint\Waypoint\waypoint_api\WaypointApi.cpp">
-      <Filter>SDK</Filter>
+    <ClCompile Include="Utils.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Monster.cpp">
+    <ClCompile Include="config_parser.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="ham\hamsandwich.cpp">
+      <Filter>hamsandwich</Filter>
+    </ClCompile>
+    <ClCompile Include="Base.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseMonster.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="MonsterManager.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Utils.cpp">
+    <ClCompile Include="Zombie.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
   </ItemGroup>
 </Project>

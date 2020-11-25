@@ -1,116 +1,141 @@
 #include "amxxmodule.h"
-#include "WaypointApi.h"
+#include "config_parser.h"
+#include "ham/hamsandwich.h"
+#include "HLTypeConversion.h"
+#include "MonsterManager.h"
+#include "Utils.h"
 
-Node *g_pStartNode;
-Node *g_pEndNode;
+static HLTypeConversion s_TypeConversion;
 
-short g_SpriteBeam4;
-
-char* UTIL_VarArgs(const char* format, ...)
+void OnWallTraceAttack(HamHook* hook, void* pthis, entvars_t* pattacker, float damage, Vector dir, TraceResult* ptr, int damagebits)
 {
-	va_list argptr;
-	static char string[1024];
+	int _state = HAM_UNSET;
+	HAM_HOOK_PUSH(nullptr, nullptr, &_state);
 
-	va_start(argptr, format);
-	vsprintf(string, format, argptr);
-	va_end(argptr);
+	/* pre start */
+	GetMonsterManager().OnTraceAttack(s_TypeConversion.cbase_to_edict(pthis), pattacker, damage, dir, ptr, damagebits);
+	/* pre end */
 
-	return string;
+	HAM_HOOK_CHECK(_state)
+	{
+#if defined(_WIN32)
+		reinterpret_cast<void(__fastcall*)(void*, int, entvars_t*, float, Vector, TraceResult*, int)>(hook->func)(pthis, 0, pattacker, damage, dir, ptr, damagebits);
+#elif defined(__linux__) || defined(__APPLE__)
+		reinterpret_cast<void (*)(void*, entvars_t*, float, Vector, TraceResult*, int)>(hook->func)(pthis, pattacker, damage, dir, ptr, damagebits);
+#endif
+
+		/* post start */
+		/* post end */
+	}
+
+	HAM_HOOK_POP();
 }
 
-void UTIL_BeamPoints(edict_t* pEntity, const Vector& pos1, const Vector& pos2, short sprite, int startFrame, int frameRate, int life, int width, int noise, int r, int g, int b, int brightness, int speed)
+// test return int
+int OnWallTakeDamage(HamHook* hook, void* pthis, entvars_t* inflictor, entvars_t* attacker, float damage, int damagebits)
 {
-	MESSAGE_BEGIN(pEntity == nullptr ? MSG_BROADCAST : MSG_ONE_UNRELIABLE, SVC_TEMPENTITY, NULL, pEntity);
-	WRITE_BYTE(TE_BEAMPOINTS);
-	WRITE_COORD(pos1.x);
-	WRITE_COORD(pos1.y);
-	WRITE_COORD(pos1.z);
-	WRITE_COORD(pos2.x);
-	WRITE_COORD(pos2.y);
-	WRITE_COORD(pos2.z);
-	WRITE_SHORT(sprite);
-	WRITE_BYTE(startFrame);		// startframe
-	WRITE_BYTE(frameRate);		// framerate
-	WRITE_BYTE(life);		// life
-	WRITE_BYTE(width);		// width
-	WRITE_BYTE(noise);		// noise
-	WRITE_BYTE(r);	// r
-	WRITE_BYTE(g);		// g
-	WRITE_BYTE(b);		// b
-	WRITE_BYTE(brightness);	// brightness
-	WRITE_BYTE(speed);		// speed
-	MESSAGE_END();
+	int _state = HAM_UNSET;
+	int _origret = 0;
+	int _result = 0;
+	HAM_HOOK_PUSH(&_origret, &_result, &_state); // push stack
+
+	/* pre start */
+	/* pre end */
+
+	HAM_HOOK_CHECK(_state) // if (state < HAM_SUPERCEDE)
+	{
+#if defined(_WIN32)
+		_origret = reinterpret_cast<int(__fastcall*)(void*, int, entvars_t*, entvars_t*, float, int)>(hook->func)(pthis, 0, inflictor, attacker, damage, damagebits);
+#elif defined(__linux__) || defined(__APPLE__)
+		_origret = reinterpret_cast<int (*)(void*, entvars_t*, entvars_t*, float, int)>(hook->func)(pthis, inflictor, attacker, damage, damagebits);
+#endif
+
+		/* post start */
+		/* post end */
+	}
+
+	HAM_HOOK_POP(); // pop stack
+
+	HAM_CHECK_RETURN(_state, _origret); // if not HAM_OVERRIDE, keep the original result
+	return _result;
+}
+
+// test return vector
+#ifdef _WIN32
+void OnPlayerEyePosition(HamHook* hook, void* pthis, Vector* out)
+#elif defined(__linux__) || defined(__APPLE__)
+void OnPlayerEyePosition(HamHook* hook, Vector* out, void* pthis)
+#endif
+{
+	int _state = HAM_UNSET;
+	Vector _origret, _result;
+
+	HAM_HOOK_PUSH(&_origret, &_result, &_state); // push stack
+
+	HAM_MEMSET_VOID(&_result, 0x0, Vector);
+	HAM_MEMSET_VOID(&_origret, 0x0, Vector);
+
+	/* pre start */
+	/* pre end */
+
+	HAM_HOOK_CHECK(_state) // if (state < HAM_SUPERCEDE)
+	{
+#if defined(_WIN32)
+		reinterpret_cast<void(__fastcall*)(void*, int, Vector*)>(hook->func)(pthis, 0, &_origret);
+#elif defined(__linux__) || defined(__APPLE__)
+		_origret = reinterpret_cast<Vector(*)(void*)>(hook->func)(pthis);
+#endif
+
+		/* post start */
+
+		SET_HAM_STATE(HAM_OVERRIDE);
+		SET_HAM_RESULT(Vector, Vector(369, 689, 777));
+
+		Vector* orig = GET_HAM_ORIGRET(Vector);
+
+		SERVER_PRINT(VARARGS("state = %d, result(%.2f, %.2f, %.2f), orig(%.2f, %.2f, %.2f)\n", 
+			_state, _result.x, _result.y, _result.z, orig->x, orig->y, orig->z));
+
+		/* post end */
+	}
+
+	HAM_HOOK_POP(); // pop stack
+
+	HAM_CHECK_RETURN_VEC(_state, out, &_origret); // if not HAM_OVERRIDE, keep the original result
+	HAM_MEMCPY_VOID(out, &_result, Vector);
+	SERVER_PRINT("new result\n");
 }
 
 void OnAmxxAttach()
 {
-	WP_RequestFunctions();
+	ReadConfig();
 }
 
-void OnPluginsLoaded()
+void OnAmxxDetach()
 {
-	g_SpriteBeam4 = PRECACHE_MODEL("sprites/zbeam4.spr");
-
-	g_pStartNode = nullptr;
-	g_pEndNode = nullptr;
-
-	SERVER_PRINT("Monster module loaded...\n");
+	CloseConfigFiles();
+	ClearHamHooks();
 }
 
 void ClientCommand(edict_t* pEntity)
 {
-	const char* pszCmd = CMD_ARGV(0);
-
-	if (strcmp(pszCmd, "mo_s") == 0)
-	{
-		g_pStartNode = WP_FindClosestNode(pEntity->v.origin, 500.0f, true);
-		if (g_pStartNode != nullptr)
-		{
-			Vector pos = g_pStartNode->GetPosition();
-			CLIENT_PRINTF(pEntity, print_console, UTIL_VarArgs("[MO] start node set. {%.f, %.f, %.f}\n", pos.x, pos.y, pos.z));
-		}
-
-		RETURN_META(MRES_SUPERCEDE);
-	}
-	else if (strcmp(pszCmd, "mo_e") == 0)
-	{
-		g_pEndNode = WP_FindClosestNode(pEntity->v.origin, 500.0f, true);
-		if (g_pEndNode != nullptr)
-		{
-			Vector pos = g_pEndNode->GetPosition();
-			CLIENT_PRINTF(pEntity, print_console, UTIL_VarArgs("[MO] start node set. {%.f, %.f, %.f}\n", pos.x, pos.y, pos.z));
-		}
-
-		RETURN_META(MRES_SUPERCEDE);
-	}
-	else if (strcmp(pszCmd, "mo_go") == 0)
-	{
-		if (g_pStartNode != nullptr && g_pEndNode != nullptr)
-		{
-			std::vector<Node*> result;
-			if (WP_FindShortestPath(g_pStartNode, g_pEndNode, result))
-			{
-				if (result.size() > 1)
-				{
-					for (auto it1 = result.begin(), it2 = ++result.begin(); it2 != result.end(); ++it1, ++it2)
-					{
-						UTIL_BeamPoints(pEntity, (*it1)->GetPosition(), (*it2)->GetPosition(), g_SpriteBeam4, 0, 0, 100, 10, 3, 0, 50, 250, 255, 0);
-					}
-				}
-
-				CLIENT_PRINTF(pEntity, print_console, UTIL_VarArgs("[MO] found (%d) paths.\n", result.size()));
-				RETURN_META(MRES_SUPERCEDE);
-			}
-		}
-
-		CLIENT_PRINTF(pEntity, print_console, "[MO] path not found.\n");
-		RETURN_META(MRES_SUPERCEDE);
-	}
-
 	RETURN_META(MRES_IGNORED);
 }
 
 void DispatchThink(edict_t* pEntity)
 {
 	RETURN_META(MRES_IGNORED);
+}
+
+void OnPluginsLoaded()
+{
+	s_TypeConversion.init();
+
+	SERVER_PRINT("Monster Module loaded...\n");
+
+	RegisterHam(Ham_TraceAttack, "func_wall", reinterpret_cast<void*>(OnWallTraceAttack));
+	RegisterHam(Ham_TakeDamage, "func_wall", reinterpret_cast<void*>(OnWallTakeDamage));
+	RegisterHam(Ham_EyePosition, "player", reinterpret_cast<void*>(OnPlayerEyePosition));
+
+	GetMonsterManager().Precache();
 }
